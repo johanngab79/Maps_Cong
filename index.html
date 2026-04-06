@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Congregaciones · Mexicali</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%;font-size:16px}
+body{font-family:"DM Sans",sans-serif;background:#08090d;color:#f0ede8;height:100vh;display:flex;flex-direction:column;overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+:root{
+  --gold:#c9a84c;--gold-light:#e8cb7a;--gold-dim:rgba(201,168,76,.14);--gold-glow:rgba(201,168,76,.32);
+  --ink:#08090d;--ink2:#0f1018;--ink3:#171923;--ink4:#1e2130;
+  --line:rgba(201,168,76,.2);--line2:rgba(255,255,255,.07);
+  --text:#f0ede8;--text2:#b8b4ad;--text3:#6e6b65;
+  --warn:#e8a44a;--radius:14px;--shadow:0 20px 48px rgba(0,0,0,.6)
+}
+
+/* ── HEADER ── */
+.header{flex-shrink:0;background:var(--ink2);padding:16px 20px 14px;display:flex;align-items:center;gap:13px;border-bottom:1px solid var(--line);position:relative;z-index:20}
+.header::after{content:"";position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.header-logo{width:42px;height:42px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--gold) 0%,#7a5c1e 100%);display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:0 0 20px var(--gold-glow)}
+.header-titles{flex:1;min-width:0}
+.header-titles h1{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:700;letter-spacing:.4px;color:var(--text);line-height:1}
+.header-titles p{font-size:11px;font-weight:500;letter-spacing:1.6px;text-transform:uppercase;color:var(--gold);margin-top:3px;opacity:.85}
+.header-badge{flex-shrink:0;background:var(--gold-dim);border:1px solid var(--line);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:700;color:var(--gold-light);letter-spacing:.3px;white-space:nowrap;transition:all .3s}
+
+/* ── TAB BAR (2 rows, all visible, no scroll) ── */
+.tabbar{flex-shrink:0;background:var(--ink2);border-bottom:1px solid var(--line2);padding:8px 12px}
+.tab-row{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.tab{padding:9px 4px;border-radius:24px;font-size:11.5px;font-weight:600;letter-spacing:.05px;cursor:pointer;border:1px solid transparent;color:var(--text3);background:transparent;transition:all .22s cubic-bezier(.4,0,.2,1);user-select:none;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tab:hover{color:var(--text2);background:var(--ink4)}
+.tab.active{background:var(--gold-dim);border-color:var(--gold);color:var(--gold-light)}
+
+/* ── LAYOUT ── */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:310px;flex-shrink:0;background:var(--ink2);border-right:1px solid var(--line2);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-search{padding:13px 13px 9px;flex-shrink:0;border-bottom:1px solid var(--line2)}
+.search-wrap{position:relative}
+.search-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text3);pointer-events:none}
+.search-input{width:100%;background:var(--ink3);border:1px solid var(--line2);border-radius:30px;padding:11px 14px 11px 40px;font-family:"DM Sans",sans-serif;font-size:15px;font-weight:400;color:var(--text);outline:none;-webkit-appearance:none;transition:border-color .2s,box-shadow .2s}
+.search-input::placeholder{color:var(--text3)}
+.search-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+.sidebar-count{padding:10px 17px 5px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);flex-shrink:0}
+.cong-list{overflow-y:auto;flex:1;padding:4px 9px 20px;-webkit-overflow-scrolling:touch}
+.cong-list::-webkit-scrollbar{width:3px}
+.cong-list::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+
+/* ── CONG ITEM ── */
+.cong-item{display:flex;align-items:center;gap:12px;padding:14px 13px;border-radius:13px;margin-bottom:5px;cursor:pointer;border:1px solid transparent;transition:all .2s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.cong-item::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:3px 0 0 3px;opacity:0;transform:scaleY(0);transition:all .2s cubic-bezier(.4,0,.2,1)}
+.cong-item:hover{background:var(--ink3);border-color:var(--line2)}
+.cong-item:hover::before{opacity:.5;transform:scaleY(1)}
+.cong-item.active{background:var(--gold-dim);border-color:var(--gold)}
+.cong-item.active::before{opacity:1;transform:scaleY(1)}
+.cong-icon{width:40px;height:40px;border-radius:10px;flex-shrink:0;background:var(--ink4);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .2s}
+.cong-item.active .cong-icon{background:var(--gold-dim);border-color:var(--line)}
+.cong-info{flex:1;min-width:0}
+.cong-nombre{font-size:14px;font-weight:600;color:var(--text);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cong-item.active .cong-nombre{color:var(--gold-light)}
+.cong-zona{font-size:11px;font-weight:500;color:var(--text3);margin-top:2px;letter-spacing:.2px}
+.cong-arrow{font-size:18px;color:var(--text3);opacity:0;transform:translateX(-4px);transition:all .2s;line-height:1}
+.cong-item:hover .cong-arrow,.cong-item.active .cong-arrow{opacity:1;transform:translateX(0);color:var(--gold)}
+.pending-pip{width:8px;height:8px;border-radius:50%;background:var(--warn);flex-shrink:0;box-shadow:0 0 8px var(--warn)}
+
+/* ── SALON GROUP (por salón view) ── */
+.salon-group{margin-bottom:4px}
+.salon-header{display:flex;align-items:center;gap:10px;padding:10px 13px 8px;cursor:pointer;user-select:none}
+.salon-header-icon{width:34px;height:34px;border-radius:9px;background:var(--gold-dim);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.salon-header-info{flex:1;min-width:0}
+.salon-header-name{font-size:13px;font-weight:700;color:var(--gold-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.salon-header-count{font-size:11px;color:var(--text3);margin-top:1px;letter-spacing:.2px}
+.salon-chevron{font-size:13px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.salon-group.open .salon-chevron{transform:rotate(90deg)}
+.salon-congs{display:none;padding:0 9px 6px 52px}
+.salon-group.open .salon-congs{display:block}
+.salon-cong-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;margin-bottom:3px;cursor:pointer;border:1px solid transparent;transition:all .18s}
+.salon-cong-item:hover{background:var(--ink3);border-color:var(--line2)}
+.salon-cong-item.active{background:var(--gold-dim);border-color:var(--gold)}
+.salon-cong-dot{width:6px;height:6px;border-radius:50%;background:var(--line);flex-shrink:0;transition:background .18s}
+.salon-cong-item.active .salon-cong-dot{background:var(--gold)}
+.salon-cong-name{font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.salon-cong-item.active .salon-cong-name{color:var(--gold-light)}
+.salon-divider{height:1px;background:var(--line2);margin:2px 9px 6px}
+
+/* ── DETAIL ── */
+.detail{flex:1;overflow-y:auto;background:var(--ink);-webkit-overflow-scrolling:touch}
+.detail::-webkit-scrollbar{width:3px}
+.detail::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+
+/* EMPTY */
+.empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px;text-align:center}
+.empty-ring{width:92px;height:92px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:36px;animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--gold-dim)}50%{box-shadow:0 0 0 14px transparent}}
+.empty h2{font-family:"Cormorant Garamond",serif;font-size:26px;font-weight:700;color:var(--text2);letter-spacing:.4px}
+.empty p{font-size:14px;color:var(--text3);max-width:220px;line-height:1.7}
+
+/* DETAIL CARD */
+.detail-wrap{padding:22px;max-width:680px;animation:fadeUp .28s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+.hero{border-radius:20px;overflow:hidden;margin-bottom:16px;position:relative;background:linear-gradient(135deg,#0e1a10 0%,#0a0e1a 50%,#110e08 100%);border:1px solid var(--line);box-shadow:var(--shadow)}
+.hero-glow{position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,var(--gold-glow) 0%,transparent 70%);pointer-events:none}
+.hero-pattern{position:absolute;inset:0;opacity:.04;background-image:repeating-linear-gradient(45deg,var(--gold) 0,var(--gold) 1px,transparent 0,transparent 50%);background-size:20px 20px;pointer-events:none}
+.hero-body{padding:26px 26px 22px;position:relative;z-index:1}
+.hero-eyebrow{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:9px;display:flex;align-items:center;gap:8px}
+.hero-eyebrow::before{content:"";display:block;width:20px;height:1px;background:var(--gold)}
+.hero-title{font-family:"Cormorant Garamond",serif;font-size:34px;font-weight:700;line-height:1.1;color:var(--text);letter-spacing:.3px}
+.hero-zona{margin-top:11px;display:inline-flex;align-items:center;gap:6px;background:var(--gold-dim);border:1px solid var(--line);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:600;color:var(--gold-light);letter-spacing:.5px}
+
+.info-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:16px}
+.info-card{background:var(--ink2);border:1px solid var(--line2);border-radius:var(--radius);padding:17px 19px;display:flex;gap:13px;align-items:flex-start;transition:border-color .2s}
+.info-card:hover{border-color:var(--line)}
+.info-card-icon{width:40px;height:40px;border-radius:10px;flex-shrink:0;background:var(--gold-dim);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:17px}
+.info-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.info-value{font-size:15px;font-weight:500;color:var(--text);line-height:1.55}
+.info-value a{color:var(--gold-light);text-decoration:none;font-weight:600}
+
+.map-card{background:var(--ink2);border:1px solid var(--line2);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
+.map-header{padding:13px 17px 11px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line2)}
+.map-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3)}
+.map-open-btn{font-size:12px;font-weight:700;color:var(--gold);cursor:pointer;background:none;border:none;font-family:"DM Sans",sans-serif;display:flex;align-items:center;gap:3px;-webkit-appearance:none;padding:0}
+.map-open-btn:hover{opacity:.7}
+.map-frame{width:100%;height:190px;position:relative;cursor:pointer;overflow:hidden;background:linear-gradient(135deg,#0d1f1a 0%,#0a1020 100%);display:flex;align-items:center;justify-content:center}
+.map-thumb-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;text-align:center;pointer-events:none}
+.map-pin{font-size:36px;filter:drop-shadow(0 0 12px var(--gold-glow))}
+.map-coords{font-size:12px;font-weight:600;color:var(--gold-light);letter-spacing:.5px;font-family:"DM Sans",sans-serif;opacity:.8}
+.map-tap{font-size:12px;color:var(--text3);font-family:"DM Sans",sans-serif}
+.map-overlay{position:absolute;inset:0;background:rgba(8,9,13,0);display:flex;align-items:center;justify-content:center;transition:background .25s}
+.map-frame:hover .map-overlay,.map-frame:active .map-overlay{background:rgba(8,9,13,.6)}
+.map-overlay-pill{background:var(--gold);color:#000;padding:12px 24px;border-radius:30px;font-weight:700;font-size:13px;letter-spacing:.3px;display:flex;align-items:center;gap:6px;box-shadow:0 4px 20px rgba(0,0,0,.5);opacity:0;transform:scale(.9) translateY(4px);transition:all .25s cubic-bezier(.4,0,.2,1)}
+.map-frame:hover .map-overlay-pill,.map-frame:active .map-overlay-pill{opacity:1;transform:scale(1) translateY(0)}
+
+.pending-card{background:rgba(232,164,74,.07);border:1px solid rgba(232,164,74,.25);border-radius:var(--radius);padding:17px 19px;display:flex;gap:13px;align-items:flex-start;margin-bottom:18px}
+.pending-card-icon{font-size:22px;flex-shrink:0}
+.pending-card p{font-size:14px;font-weight:500;color:var(--warn);line-height:1.7}
+
+.actions{display:flex;gap:9px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:13px 22px;border-radius:30px;font-family:"DM Sans",sans-serif;font-size:14px;font-weight:700;letter-spacing:.2px;cursor:pointer;border:none;text-decoration:none;transition:all .2s cubic-bezier(.4,0,.2,1);-webkit-appearance:none;position:relative;overflow:hidden}
+.btn-primary{background:linear-gradient(135deg,var(--gold) 0%,#a07830 100%);color:#08090d;box-shadow:0 4px 18px var(--gold-glow)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 7px 26px var(--gold-glow)}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{background:var(--ink3);color:var(--text);border:1px solid var(--line2)}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold-light);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--line2)}
+.btn-ghost:hover{border-color:var(--text3);color:var(--text)}
+
+/* MOBILE BACK */
+.mob-back{display:none;align-items:center;gap:8px;padding:14px 17px;font-size:15px;font-weight:600;color:var(--gold);cursor:pointer;border-bottom:1px solid var(--line2);flex-shrink:0;background:var(--ink2)}
+.no-results{padding:40px 20px;text-align:center;color:var(--text3);font-size:14px;line-height:1.7}
+
+/* ── RESPONSIVE ── */
+@media(max-width:720px){
+  body{height:auto;min-height:100vh;overflow:auto}
+  .sidebar{width:100%;height:auto;overflow:visible;border-right:none;border-bottom:1px solid var(--line2)}
+  .cong-list{overflow:visible;max-height:none;height:auto}
+  .layout{flex-direction:column;overflow:visible;height:auto}
+  .detail{overflow:visible;height:auto;min-height:50vh}
+  .layout.show-detail .sidebar{display:none}
+  .layout.show-detail .detail{display:block}
+  .mob-back{display:flex!important}
+  .hero-title{font-size:28px}
+  .header-titles h1{font-size:20px}
+  .tab-row{display:flex;flex-wrap:wrap;justify-content:center;gap:5px}
+  .tab{flex:0 0 calc(33.33% - 4px);font-size:11px;padding:8px 4px;min-width:0}
+  .tab:nth-child(4),.tab:nth-child(5){flex:0 0 calc(48% - 3px)}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">🏛️</div>
+  <div class="header-titles">
+    <h1>Congregaciones</h1>
+    <p>Testigos de Jehová · Mexicali B.C.</p>
+  </div>
+  <div class="header-badge" id="headerBadge">92 congregaciones</div>
+</header>
+
+<nav class="tabbar">
+  <div class="tab-row">
+    <div class="tab active" data-tab="todas">Todas</div>
+    <div class="tab" data-tab="ciudad">🏙 Ciudad</div>
+    <div class="tab" data-tab="valle">🌾 Valle</div>
+    <div class="tab" data-tab="pendientes">⚠ Pendientes</div>
+    <div class="tab" data-tab="salon">🏛 Por Salón</div>
+  </div>
+</nav>
+
+<div class="layout" id="layout">
+  <aside class="sidebar">
+    <div class="sidebar-search">
+      <div class="search-wrap">
+        <span class="search-ico">🔍</span>
+        <input class="search-input" id="searchInput" type="text" placeholder="Buscar congregación…" oninput="renderList()">
+      </div>
+    </div>
+    <div class="sidebar-count" id="sideCount">Cargando…</div>
+    <div class="cong-list" id="congList"></div>
+  </aside>
+
+  <main class="detail" id="detail">
+    <div class="mob-back" onclick="goBack()">‹ Regresar al listado</div>
+    <div id="detailInner">
+      <div class="empty">
+        <div class="empty-ring">🏛️</div>
+        <h2>Selecciona una congregación</h2>
+        <p>Elige cualquier congregación de la lista para ver su ubicación y cómo llegar.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const salones = {
+  independencia:    { nombre:'Salón Independencia',         direccion:'Av. Pedro Moreno 1815, Independencia, 21290 Mexicali, B.C.',           lat:32.6331656,  lng:-115.4168459, phone:null,              maps:'https://maps.google.com/?cid=7413370489775120537' },
+  gonzalez_ortega:  { nombre:'Salón González Ortega',        direccion:'C. Primera 2322, González Ortega Poniente, 21398 Mexicali, B.C.',       lat:32.6081472,  lng:-115.3994378, phone:'+52 686 592 9188', maps:'https://maps.google.com/?cid=3136405827542374018' },
+  xochimilco:       { nombre:'Salón Xochimilco',             direccion:'Lago Pátzcuaro 67, Zona Urbana Xochimilco, 21380 Mexicali, B.C.',       lat:32.5846084,  lng:-115.4847689, phone:'+52 686 355 4274', maps:'https://maps.google.com/?cid=18204408669195177443' },
+  nueva_esperanza:  { nombre:'Salón Nueva Esperanza',        direccion:'Yucatán 894, Nueva Esperanza, 21140 Mexicali, B.C.',                    lat:32.6465131,  lng:-115.4924682, phone:null,              maps:'https://maps.google.com/?cid=3328346915284549973' },
+  esperanza:        { nombre:'Salón Esperanza',              direccion:'Tarragona 1290, Esperanza Conjunto Urbano, 21350 Mexicali, B.C.',        lat:32.6129089,  lng:-115.4670598, phone:null,              maps:'https://maps.google.com/?cid=12544192476952412399' },
+  orizaba:          { nombre:'Salón Orizaba',                direccion:'Luis Alcerrega 2493, Zona Urbana Orizaba, 21160 Mexicali, B.C.',         lat:32.6455876,  lng:-115.5144657, phone:'+52 686 552 7033', maps:'https://maps.google.com/?cid=5747214885123097409' },
+  lopez_mateos:     { nombre:'Salón López Mateos',           direccion:'Calz. Anáhuac 1480, Adolfo López Mateos, 21330 Mexicali, B.C.',          lat:32.6216902,  lng:-115.4794616, phone:'+52 686 138 7089', maps:'https://maps.google.com/?cid=1127523179953142112' },
+  coahuila:         { nombre:'Salón Ex-Ejido Coahuila',      direccion:'Av. Saltillo 723, Ex-Ejido Coahuila, 21360 Mexicali, B.C.',              lat:32.6268612,  lng:-115.4357943, phone:'+52 686 202 7263', maps:'https://maps.google.com/?cid=9383691144003717878' },
+  valle_alamo:      { nombre:'Salón Valle del Álamo',        direccion:'Av. Corregidora Norte 2999, Valle de Álamo, 21225 Mexicali, B.C.',        lat:32.6595486,  lng:-115.3939728, phone:'+52 963 165 6122', maps:'https://maps.google.com/?cid=16316624507271821336' },
+  pasadena:         { nombre:'Salón Pasadena',               direccion:'Bajos de Pasadena 214, Pasadena, 21150 Mexicali, B.C.',                  lat:32.6549033,  lng:-115.4794239, phone:null,              maps:'https://maps.google.com/?cid=6729557085849436341' },
+  san_ignacio:      { nombre:'Salón Misión de San Ignacio',  direccion:'Blvd. Calz. Manuel Gómez Morín 523, Col. Misión de San Ignacio, 21137 Mexicali, B.C.', lat:32.653335, lng:-115.533325, phone:'+52 686 552 0755', maps:'https://maps.google.com/?cid=16710345424353959278' },
+  gpe_victoria:     { nombre:'Salón Guadalupe Victoria',     direccion:'C. Doceava 400, Guadalupe Victoria, 21720 B.C.',                         lat:32.2905886,  lng:-115.1023149, phone:null,              maps:'https://maps.google.com/maps?q=32.2905886,-115.1023149' },
+  villa_florida:    { nombre:'Salón Villa Florida',          direccion:'Av. De Los Acubas 3868, Fracc. Villa Florida, 21395 Mexicali, B.C.',       lat:32.599940,   lng:-115.369270,  phone:'+52 686 395 0461', maps:'https://maps.google.com/maps?q=32.59994,-115.36927' },
+  granjas_virreyes: { nombre:'Salón Granjas Virreyes',       direccion:'Av. Yugoslavia 249, Fracc. Granjas Virreyes, 21190 Mexicali, B.C.',        lat:32.616441,   lng:-115.523753,  phone:null,              maps:'https://maps.google.com/maps?q=32.616441,-115.523753' },
+  glez_ortega_sur:  { nombre:'Salón González Ortega Sur',    direccion:'Río Sabinas 2929, González Ortega, 21397 Mexicali, B.C.',                 lat:32.5896441,  lng:-115.3913433, phone:null,              maps:'https://maps.google.com/maps?q=32.5896441,-115.3913433' },
+  islas_agrarias:   { nombre:'Salón Islas Agrarias',         direccion:'Av. Emiliano Zapata 591, Entre M. Domínguez y A. Jiménez, 21600 Islas Agrarias, B.C.', lat:32.611745, lng:-115.324874, phone:null, maps:'https://maps.google.com/maps?q=32.611745,-115.324874' },
+  // VALLE
+  queretaro:        { nombre:'Salón Ejido Querétaro',        direccion:'C. C, 21620 Ejido Hechicera, B.C.',                                      lat:32.5451642,  lng:-115.1517945, phone:null,              maps:'https://maps.google.com/maps?q=32.5451642,-115.1517945' },
+  lazaro_cardenas:  { nombre:'Salón Lázaro Cárdenas',        direccion:'21821 Pob. Lázaro Cárdenas, B.C.',                                        lat:32.3691781,  lng:-115.0590822, phone:null,              maps:'https://maps.google.com/maps?q=32.3691781,-115.0590822' },
+  algodones:        { nombre:'Salón Los Algodones',          direccion:'Av. E 362, Vicente Guerrero, 21970 B.C.',                                 lat:32.7143679,  lng:-114.7313100, phone:null,              maps:'https://maps.google.com/maps?q=32.7143679,-114.7313100' },
+  hermosillo_ej:    { nombre:'Salón Ejido Hermosillo',       direccion:'Emiliano Zapata 149-141, Ejido Hermosillo, 21840 B.C.',                   lat:32.5099339,  lng:-114.9270350, phone:null,              maps:'https://maps.google.com/maps?q=32.5099339,-114.9270350' },
+  paredones:        { nombre:'Salón Paredones',              direccion:'Victoria, 21920 Pob. Paredones, B.C.',                                    lat:32.603098,   lng:-114.9208441, phone:null,              maps:'https://maps.google.com/maps?q=32.603098,-114.9208441' },
+  morelos:          { nombre:'Salón Ciudad Morelos',         direccion:'Baja California 6 No. 1590, Ciudad Morelos, 21960 B.C.',                  lat:32.634657,   lng:-114.8540749, phone:null,              maps:'https://maps.google.com/maps?q=32.634657,-114.8540749' },
+  jiquilpan:        { nombre:'Salón Ejido Jiquilpan',        direccion:'Rodolfo Ruiz Orantes, 21900 Ejido Jiquilpan, B.C.',                       lat:32.502215,   lng:-115.0658344, phone:null,              maps:'https://maps.google.com/maps?q=32.502215,-115.0658344' },
+  tehuantepec:      { nombre:'Salón Ejido Tehuantepec',      direccion:'21904 Ejido Tehuantepec, B.C.',                                           lat:32.5516289,  lng:-115.0284034, phone:null,              maps:'https://maps.google.com/maps?q=32.5516289,-115.0284034' },
+  oaxaca:           { nombre:'Salón Ejido Oaxaca',           direccion:'C. Hechicera 43, Delta Oaxaca, 21700 Delta, B.C.',                        lat:32.3553422,  lng:-115.1847781, phone:null,              maps:'https://maps.google.com/maps?q=32.3553422,-115.1847781' },
+  sinaloa_ej:       { nombre:'Salón Ejido Sinaloa',          direccion:'Lázaro Cárdenas, 21620 Ejido Sinaloa, B.C.',                              lat:32.5439668,  lng:-115.2725405, phone:null,              maps:'https://maps.google.com/maps?q=32.5439668,-115.2725405' },
+  michoacan:        { nombre:'Salón Michoacán de Ocampo',    direccion:'Av. Venustiano Carranza 100, Michoacán de Ocampo, 21700 B.C.',             lat:32.4682131,  lng:-115.3051078, phone:null,              maps:'https://maps.google.com/maps?q=32.4682131,-115.3051078' },
+  choropo:          { nombre:'Salón Ejido El Choropo',       direccion:'Lima, 21615 Ejido El Choropo, B.C.',                                      lat:32.5303834,  lng:-115.4146212, phone:null,              maps:'https://maps.google.com/maps?q=32.5303834,-115.4146212' },
+  guanajuato_ej:    { nombre:'Salón Ejido Guanajuato',       direccion:'21628 Ejido Guanajuato, B.C.',                                            lat:32.5202398,  lng:-115.3444912, phone:null,              maps:'https://maps.google.com/maps?q=32.5202398,-115.3444912' },
+  nuevo_leon_ej:    { nombre:'Salón Ejido Nuevo León',       direccion:'21705 Ejido Nuevo León, B.C.',                                            lat:32.4081241,  lng:-115.1843008, phone:null,              maps:'https://maps.google.com/maps?q=32.4081241,-115.1843008' },
+  // NUEVOS SALONES CIUDAD
+  los_naranjos:     { nombre:'Salón Los Naranjos',           direccion:'Carr. Mexicali-San Felipe Km 1.5, Fracc. Los Naranjos, 21387 Mexicali, B.C.',    lat:32.588675,  lng:-115.430466, phone:null, maps:'https://maps.google.com/maps?q=32.588675,-115.430466' },
+  glez_ortega_sur2: { nombre:'Salón González Ortega Sur',    direccion:'Calle Río Sabinas 2929, Entre 7a y 8a, Col. González Ortega, 21397 Mexicali, B.C.', lat:32.589983, lng:-115.391336, phone:null, maps:'https://maps.google.com/maps?q=32.589983,-115.391336' },
+  puebla_1:         { nombre:'Salón Puebla 1',               direccion:'Calle Primera 620, Esq. Motolínea, 21620 Puebla, B.C.',                            lat:32.567731,  lng:-115.347502, phone:null, maps:'https://maps.google.com/maps?q=32.567731,-115.347502' },
+  puebla_2:         { nombre:'Salón Puebla 2',               direccion:'Av. 5 de Mayo 901, Esq. Coatzingo, Rincones de Puebla, 21620 Puebla, B.C.',         lat:32.557367,  lng:-115.333510, phone:null, maps:'https://maps.google.com/maps?q=32.557367,-115.33351' },
+  campestre:        { nombre:'Salón Campestre',              direccion:'Av. Lago Superior 2335, U.H. Xochimilco, 21380 Mexicali, B.C.',                     lat:32.606456,  lng:-115.444648, phone:null, maps:'https://maps.google.com/maps?q=32.606456,-115.444648' },
+  zacatecas:        { nombre:'Salón Zacatecas',              direccion:'Calle Nochistlán 1763, Col. Ex Ejido Zacatecas, 21090 Mexicali, B.C.',               lat:32.625820,  lng:-115.464654, phone:null, maps:'https://maps.google.com/maps?q=32.62582,-115.464654' },
+  voluntad:         { nombre:'Salón Voluntad',               direccion:'Calle Heroico Colegio Militar 2430, Fracc. Voluntad, 21323 Mexicali, B.C.',          lat:32.596929,  lng:-115.506353, phone:null, maps:'https://maps.google.com/maps?q=32.596929,-115.506353' },
+  zaragoza:         { nombre:'Salón Zaragoza',               direccion:'Av. F, Lote 13 Mzna 17, Col. Zaragoza 2a Secc., 21324 Mexicali, B.C.',              lat:32.600598,  lng:-115.532418, phone:null, maps:'https://maps.google.com/maps?q=32.600598,-115.532418' },
+  virreyes:         { nombre:'Salón Virreyes',               direccion:'Av. Yugoslavia 249, Fracc. Granjas Virreyes, 21190 Mexicali, B.C.',                  lat:32.616441,  lng:-115.523753, phone:null, maps:'https://maps.google.com/maps?q=32.616441,-115.523753' },
+  santa_isabel:     { nombre:'Salón Santa Isabel',           direccion:'Calle Del Sol 100, Esq. Polux, Col. Amp. Santa Isabel, 21139 Mexicali, B.C.',        lat:32.624335,  lng:-115.576165, phone:null, maps:'https://maps.google.com/maps?q=32.624335,-115.576165' },
+  progreso:         { nombre:'Salón Progreso',               direccion:'Av. Gral. Manuel Ávila Camacho 300, Col. Progreso, 21188 Mexicali, B.C.',             lat:32.584707,  lng:-115.582363, phone:null, maps:'https://maps.google.com/maps?q=32.584707,-115.582363' },
+  ecuador:          { nombre:'Salón República de Ecuador',   direccion:'Av. Rep. de Ecuador 1157, Parque Industrial, 21210 Mexicali, B.C.',                  lat:32.664334,  lng:-115.427480, phone:null, maps:'https://maps.google.com/maps?q=32.664334,-115.42748' },
+  // PENDIENTES
+  veracruz_ej:      { nombre:'Salón Ejido Veracruz 2',        direccion:'Carretera Estatal 3, 21720 Ejido Veracruz Dos, B.C.',                              lat:32.400549,  lng:-115.066669, phone:null, maps:'https://maps.google.com/maps?q=32.400549,-115.066669' },
+  carranza_ej:      { nombre:'Salón Venustiano Carranza',      direccion:'Calle Venustiano Carranza S/N, Col. Dr. Alberto Oviedo Mota, 21730 La Carranza, B.C.', lat:32.238404, lng:-115.166833, phone:null, maps:'https://maps.google.com/maps?q=32.238404,-115.166833' },
+  estacion_coahuila:{ nombre:'Salón Estación Coahuila',       direccion:'Calle Sonora 55-A, Entre Juan Lara e I. Aldama, Col. Centro, 83500 Ing. Luis B. Sánchez, Son.', lat:32.200097, lng:-115.000098, phone:null, maps:'https://maps.google.com/maps?q=32.200097,-115.000098' },
+  sanson_flores:    { nombre:'Salón Sansón Flores',           direccion:'Calle Quinta S/N, 75m al este de San Felipe-Mexicali, Col. Jesús Sansón Flores, 21600 B.C.', lat:32.442442, lng:-115.374345, phone:null, maps:'https://maps.google.com/maps?q=32.442442,-115.374345' },
+};
+
+// ─── CONGREGACIONES ───────────────────────────────────────────────────────────
+const congregaciones = [
+  // SALÓN INDEPENDENCIA
+  { id:1,  zona:'ciudad', nombre:'Congregación Macristy',              salon:'independencia' },
+  { id:2,  zona:'ciudad', nombre:'Congregación Villa Colonial',        salon:'independencia' },
+  { id:3,  zona:'ciudad', nombre:'Congregación Pro-Hogar',             salon:'independencia' },
+  { id:4,  zona:'ciudad', nombre:'Congregación Independencia',         salon:'independencia' },
+  // SALÓN GONZÁLEZ ORTEGA
+  { id:5,  zona:'ciudad', nombre:'Congregación Orquídea',              salon:'gonzalez_ortega' },
+  { id:6,  zona:'ciudad', nombre:'Congregación Mirasol',               salon:'gonzalez_ortega' },
+  { id:7,  zona:'ciudad', nombre:'Congregación Valle del Sol',         salon:'gonzalez_ortega' },
+  { id:8,  zona:'ciudad', nombre:'Congregación Villa Bonita',          salon:'gonzalez_ortega' },
+  { id:9,  zona:'ciudad', nombre:'Congregación 18 de Marzo',           salon:'gonzalez_ortega' },
+  // SALÓN NUEVA ESPERANZA
+  { id:10, zona:'ciudad', nombre:'Congregación Esperanza',             salon:'nueva_esperanza' },
+  { id:11, zona:'ciudad', nombre:'Congregación Loma Linda',            salon:'nueva_esperanza' },
+  // SALÓN XOCHIMILCO
+  { id:12, zona:'ciudad', nombre:'Congregación Villas del Rey',        salon:'xochimilco' },
+  { id:13, zona:'ciudad', nombre:'Congregación Quintas del Rey',       salon:'xochimilco' },
+  { id:14, zona:'ciudad', nombre:'Congregación Del Prado',             salon:'xochimilco' },
+  { id:15, zona:'ciudad', nombre:'Congregación Hacienda del Bosque',   salon:'xochimilco' },
+  // SALÓN ESPERANZA
+  { id:16, zona:'ciudad', nombre:'Congregación Residencial California',salon:'esperanza' },
+  { id:17, zona:'ciudad', nombre:'Congregación Villas del Sol',        salon:'esperanza' },
+  { id:18, zona:'ciudad', nombre:'Congregación Conjunto Urbano Esperanza', salon:'esperanza' },
+  // SALÓN ORIZABA
+  { id:19, zona:'ciudad', nombre:'Congregación Pueblo Nuevo',          salon:'orizaba' },
+  { id:20, zona:'ciudad', nombre:'Congregación Poniente',              salon:'orizaba' },
+  { id:21, zona:'ciudad', nombre:'Congregación Orizaba',               salon:'orizaba' },
+  // SALÓN LÓPEZ MATEOS
+  { id:22, zona:'ciudad', nombre:'Congregación Infonavit',             salon:'lopez_mateos' },
+  { id:23, zona:'ciudad', nombre:'Congregación Castellón',             salon:'lopez_mateos' },
+  { id:24, zona:'ciudad', nombre:'Congregación El Campanario',         salon:'lopez_mateos' },
+  // SALÓN EX-EJIDO COAHUILA
+  { id:25, zona:'ciudad', nombre:'Congregación Universidad',           salon:'coahuila' },
+  { id:26, zona:'ciudad', nombre:'Congregación Vallarta',              salon:'coahuila' },
+  { id:27, zona:'ciudad', nombre:'Congregación Sta. Teresa',           salon:'coahuila' },
+  { id:28, zona:'ciudad', nombre:'Congregación Señas',                 salon:'coahuila' },
+  // SALÓN VALLE DEL ÁLAMO
+  { id:29, zona:'ciudad', nombre:'Congregación Imperial',              salon:'valle_alamo' },
+  { id:30, zona:'ciudad', nombre:'Congregación Alamitos',              salon:'valle_alamo' },
+  { id:31, zona:'ciudad', nombre:'Congregación Valle del Álamo',       salon:'valle_alamo' },
+  // SALÓN PASADENA
+  { id:32, zona:'ciudad', nombre:'Congregación Industrial',            salon:'pasadena' },
+  // SALÓN MISIÓN DE SAN IGNACIO
+  // SALÓN GUADALUPE VICTORIA
+  { id:34, zona:'ciudad', nombre:'Congregación Guadalupe Victoria',    salon:'gpe_victoria' },
+  // SALÓN VILLA FLORIDA
+  { id:35, zona:'ciudad', nombre:'Congregación Villa Florida',         salon:'villa_florida' },
+  // SALÓN GRANJAS VIRREYES
+  // SALÓN GONZÁLEZ ORTEGA SUR
+  // SALÓN ISLAS AGRARIAS
+  { id:38, zona:'ciudad', nombre:'Congregación Islas Agrarias',        salon:'islas_agrarias' },
+
+  // ── VALLE ──
+  { id:39, zona:'valle', nombre:'Congregación Querétaro',              salon:'queretaro' },
+  { id:40, zona:'valle', nombre:'Congregación Juárez',                 salon:'lazaro_cardenas' },
+  { id:41, zona:'valle', nombre:'Congregación Lázaro Cárdenas',        salon:'lazaro_cardenas' },
+  { id:42, zona:'valle', nombre:'Congregación Los Algodones',          salon:'algodones' },
+  { id:43, zona:'valle', nombre:'Congregación Hermosillo',             salon:'hermosillo_ej' },
+  { id:44, zona:'valle', nombre:'Congregación Paredones',              salon:'paredones' },
+  { id:45, zona:'valle', nombre:'Congregación Morelos',                salon:'morelos' },
+  { id:46, zona:'valle', nombre:'Congregación Jiquilpan',              salon:'jiquilpan' },
+  { id:47, zona:'valle', nombre:'Congregación Tehuantepec',            salon:'tehuantepec' },
+  { id:48, zona:'valle', nombre:'Congregación Veracruz',               salon:'veracruz_ej' },
+  { id:49, zona:'valle', nombre:'Congregación Oaxaca',                 salon:'oaxaca' },
+  { id:50, zona:'valle', nombre:'Congregación Carranza',               salon:'carranza_ej' },
+  { id:51, zona:'valle', nombre:'Congregación Sinaloa',                salon:'sinaloa_ej' },
+  { id:52, zona:'valle', nombre:'Congregación Estación Coahuila',      salon:'estacion_coahuila' },
+  { id:94, zona:'valle', nombre:'Congregación Luis B. Sánchez',          salon:'estacion_coahuila' },
+  { id:53, zona:'valle', nombre:'Congregación Sansón Flores',          salon:'sanson_flores' },
+  { id:54, zona:'valle', nombre:'Congregación Michoacán de Ocampo',    salon:'michoacan' },
+  { id:55, zona:'valle', nombre:'Congregación Choropo',                salon:'choropo' },
+  { id:56, zona:'valle', nombre:'Congregación Guanajuato',             salon:'guanajuato_ej' },
+  { id:57, zona:'valle', nombre:'Congregación Nuevo León',             salon:'nuevo_leon_ej' },
+  // SALÓN LOS NARANJOS
+  { id:58, zona:'ciudad', nombre:'Congregación Pórticos del Valle',    salon:'los_naranjos' },
+  { id:59, zona:'ciudad', nombre:'Congregación Rivera Campestre',      salon:'los_naranjos' },
+  { id:60, zona:'ciudad', nombre:'Congregación Los Naranjos',          salon:'los_naranjos' },
+  { id:61, zona:'ciudad', nombre:'Congregación Misión del Ángel',      salon:'los_naranjos' },
+  // SALÓN GONZÁLEZ ORTEGA SUR (Río Sabinas)
+  { id:62, zona:'ciudad', nombre:'Congregación Ríos',                  salon:'glez_ortega_sur2' },
+  { id:63, zona:'ciudad', nombre:'Congregación El Cóndor',             salon:'glez_ortega_sur2' },
+  { id:64, zona:'ciudad', nombre:'Congregación Los Encinos',           salon:'glez_ortega_sur2' },
+  // SALÓN PUEBLA 1
+  { id:65, zona:'ciudad', nombre:'Congregación Monarca',               salon:'puebla_1' },
+  { id:66, zona:'ciudad', nombre:'Congregación Valle del Pedregal',    salon:'puebla_1' },
+  { id:67, zona:'ciudad', nombre:'Congregación Ejido Puebla',          salon:'puebla_1' },
+  { id:68, zona:'ciudad', nombre:'Congregación Valle de Puebla',       salon:'puebla_1' },
+  // SALÓN PUEBLA 2
+  { id:69, zona:'ciudad', nombre:'Congregación Ángeles de Puebla',     salon:'puebla_2' },
+  { id:70, zona:'ciudad', nombre:'Congregación Fuentes de Puebla',     salon:'puebla_2' },
+  // SALÓN CAMPESTRE
+  { id:71, zona:'ciudad', nombre:'Congregación Campestre',             salon:'campestre' },
+  // SALÓN ZACATECAS
+  { id:72, zona:'ciudad', nombre:'Congregación Zacatecas',             salon:'zacatecas' },
+  { id:73, zona:'ciudad', nombre:'Congregación Cuauhtémoc',            salon:'zacatecas' },
+  { id:74, zona:'ciudad', nombre:'Congregación Calafia',               salon:'zacatecas' },
+  // SALÓN VOLUNTAD
+  { id:75, zona:'ciudad', nombre:'Congregación Los Portales',          salon:'voluntad' },
+  { id:76, zona:'ciudad', nombre:'Congregación División del Norte',    salon:'voluntad' },
+  { id:77, zona:'ciudad', nombre:'Congregación Barcelona',             salon:'voluntad' },
+  // SALÓN ZARAGOZA
+  { id:78, zona:'ciudad', nombre:'Congregación Zaragoza',              salon:'zaragoza' },
+  // SALÓN VIRREYES (Granjas Virreyes)
+  { id:79, zona:'ciudad', nombre:'Congregación Virreyes',              salon:'virreyes' },
+  { id:80, zona:'ciudad', nombre:'Congregación Universitaria',         salon:'virreyes' },
+  // SALÓN SANTA ISABEL
+  { id:81, zona:'ciudad', nombre:'Congregación Refugio',               salon:'santa_isabel' },
+  { id:82, zona:'ciudad', nombre:'Congregación Estrella',              salon:'santa_isabel' },
+  { id:83, zona:'ciudad', nombre:'Congregación Valle de las Misiones', salon:'santa_isabel' },
+  // SALÓN PROGRESO
+  { id:84, zona:'ciudad', nombre:'Congregación Villa de Alarcón',      salon:'progreso' },
+  { id:85, zona:'ciudad', nombre:'Congregación Valle de la Plata',     salon:'progreso' },
+  // SALÓN MISIÓN DE SAN IGNACIO (Villas del Paraíso / Real del Río)
+  { id:86, zona:'ciudad', nombre:'Congregación Villas del Paraíso',    salon:'san_ignacio' },
+  { id:87, zona:'ciudad', nombre:'Congregación Real del Río',          salon:'san_ignacio' },
+  // SALÓN REPÚBLICA DE ECUADOR
+  { id:88, zona:'ciudad', nombre:'Congregación Vista Hermosa',         salon:'ecuador' },
+  { id:89, zona:'ciudad', nombre:'Congregación Sonora',                salon:'ecuador' },
+  // SALÓN ISLAS AGRARIAS (updated)
+  { id:90, zona:'ciudad', nombre:'Congregación Islas Agrarias B',      salon:'islas_agrarias' },
+  // SALÓN VILLA FLORIDA (updated - Victoria, Villas Republica, Colorado)
+  { id:91, zona:'ciudad', nombre:'Congregación Victoria',              salon:'villa_florida' },
+  { id:92, zona:'ciudad', nombre:'Congregación Villas de la República',salon:'villa_florida' },
+  { id:93, zona:'ciudad', nombre:'Congregación Villas del Colorado',   salon:'villa_florida' },
+
+];
+// ── SALON DISPLAY NAMES ──────────────────────────────────────────
+const salonNames = {
+  independencia:'Salón Independencia',
+  gonzalez_ortega:'Salón Calle Primera (González Ortega)',
+  xochimilco:'Salón Xochimilco',
+  nueva_esperanza:'Salón Nueva Esperanza',
+  esperanza:'Salón Conjunto Urbano Esperanza',
+  orizaba:'Salón Orizaba',
+  lopez_mateos:'Salón López Mateos',
+  coahuila:'Salón Ex-Ejido Coahuila',
+  valle_alamo:'Salón Valle del Álamo',
+  pasadena:'Salón Pasadena',
+  san_ignacio:'Salón Misión de San Ignacio',
+  gpe_victoria:'Salón Guadalupe Victoria',
+  villa_florida:'Salón Villa Florida',
+  granjas_virreyes:'Salón Granjas Virreyes',
+  glez_ortega_sur:'Salón Río Sabinas (González Ortega)',
+  islas_agrarias:'Salón Islas Agrarias',
+  los_naranjos:'Salón Los Naranjos',
+  glez_ortega_sur2:'Salón Río Sabinas 2929',
+  puebla_1:'Salón Calle Primera (Ejido Puebla)',
+  puebla_2:'Salón Rincones de Puebla',
+  campestre:'Salón Lago Superior (Campestre)',
+  zacatecas:'Salón Ex-Ejido Zacatecas',
+  voluntad:'Salón Fraccionamiento Voluntad',
+  zaragoza:'Salón Colonia Zaragoza',
+  virreyes:'Salón Granjas Virreyes (Yugoslavia)',
+  santa_isabel:'Salón Santa Isabel',
+  progreso:'Salón Colonia Progreso',
+  ecuador:'Salón República de Ecuador',
+  queretaro:'Salón Ejido Querétaro',
+  lazaro_cardenas:'Salón Ejido Lázaro Cárdenas',
+  algodones:'Salón Los Algodones',
+  hermosillo_ej:'Salón Ejido Hermosillo',
+  paredones:'Salón Poblado Paredones',
+  morelos:'Salón Ciudad Morelos',
+  jiquilpan:'Salón Ejido Jiquilpan',
+  tehuantepec:'Salón Ejido Tehuantepec',
+  oaxaca:'Salón Ejido Oaxaca',
+  sinaloa_ej:'Salón Ejido Sinaloa',
+  michoacan:'Salón Ejido Michoacán de Ocampo',
+  choropo:'Salón Ejido El Choropo',
+  guanajuato_ej:'Salón Ejido Guanajuato',
+  nuevo_leon_ej:'Salón Ejido Nuevo León',
+  veracruz_ej:'Salón Ejido Veracruz 2',
+  carranza_ej:'Salón Colonia La Carranza',
+  estacion_coahuila:'Salón Ing. Luis B. Sánchez',
+  sanson_flores:'Salón Ejido Sansón Flores',
+};
+
+// ── STATE ──────────────────────────────────────────────────────────
+let currentTab = 'todas';
+let selected   = null;
+
+function getSalon(c){ return salones[c.salon]; }
+function isPending(c){ return !getSalon(c).direccion; }
+
+// ── FILTER ─────────────────────────────────────────────────────────
+function getFiltered(){
+  const q = (document.getElementById('searchInput').value||'').toLowerCase().trim();
+  return congregaciones.filter(c => {
+    const s = getSalon(c);
+    const matchTab =
+      currentTab === 'todas'      ? true :
+      currentTab === 'pendientes' ? isPending(c) :
+      currentTab === 'salon'      ? true :
+      c.zona === currentTab;
+    const matchQ = !q ||
+      c.nombre.toLowerCase().includes(q) ||
+      (s.direccion && s.direccion.toLowerCase().includes(q));
+    return matchTab && matchQ;
+  });
+}
+
+// ── RENDER LIST ─────────────────────────────────────────────────────
+function renderList(){
+  const list     = document.getElementById('congList');
+  const filtered = getFiltered();
+
+  // Count for badge — always shows count of current tab (not search)
+  const tabCount = congregaciones.filter(c => {
+    if(currentTab === 'todas') return true;
+    if(currentTab === 'pendientes') return isPending(c);
+    if(currentTab === 'salon') return true;
+    return c.zona === currentTab;
+  }).length;
+
+  const tabLabel =
+    currentTab === 'salon' ? tabCount + ' salones' :
+    tabCount + ' congregaci' + (tabCount === 1 ? 'ón' : 'ones');
+  document.getElementById('headerBadge').textContent = tabLabel;
+  document.getElementById('sideCount').textContent =
+    filtered.length + ' resultado' + (filtered.length !== 1 ? 's' : '');
+
+  list.innerHTML = '';
+
+  if(!filtered.length){
+    list.innerHTML = '<div class="no-results">Sin resultados para tu búsqueda</div>';
+    return;
+  }
+
+  // ── POR SALÓN VIEW ──
+  if(currentTab === 'salon'){
+    renderSalonGroups(filtered, list);
+    return;
+  }
+
+  // ── SORTED ALPHABETICALLY ──
+  const sorted = [...filtered].sort((a,b) => a.nombre.localeCompare(b.nombre, 'es'));
+
+  sorted.forEach(c => {
+    const pending  = isPending(c);
+    const isActive = selected && selected.id === c.id;
+    const icon     = c.zona === 'valle' ? '🌾' : '🏙';
+    const div      = document.createElement('div');
+    div.className  = 'cong-item' + (isActive ? ' active' : '');
+    div.onclick    = () => selectCong(c);
+    div.innerHTML  =
+      '<div class="cong-icon">' + icon + '</div>' +
+      '<div class="cong-info">' +
+        '<div class="cong-nombre">' + c.nombre + '</div>' +
+        '<div class="cong-zona">' + (c.zona === 'valle' ? 'Valle de Mexicali' : 'Ciudad de Mexicali') + '</div>' +
+      '</div>' +
+      (pending ? '<div class="pending-pip"></div>' : '<div class="cong-arrow">›</div>');
+    list.appendChild(div);
+  });
+}
+
+// ── RENDER SALON GROUPS ─────────────────────────────────────────────
+function renderSalonGroups(filtered, list){
+  // Group by salon key, sorted by salon display name
+  const grupos = {};
+  filtered.forEach(c => {
+    if(!grupos[c.salon]) grupos[c.salon] = [];
+    grupos[c.salon].push(c);
+  });
+
+  // Sort salon keys by display name
+  const salonKeys = Object.keys(grupos).sort((a,b) =>
+    (salonNames[a]||a).localeCompare(salonNames[b]||b, 'es')
+  );
+
+  // Update badge with salon count
+  document.getElementById('headerBadge').textContent = salonKeys.length + ' salones';
+
+  salonKeys.forEach(key => {
+    const congs = grupos[key].sort((a,b) => a.nombre.localeCompare(b.nombre, 'es'));
+    const sName = salonNames[key] || key;
+    const s     = salones[key];
+    const zona  = congs[0].zona === 'valle' ? '🌾' : '🏙';
+
+    const group = document.createElement('div');
+    group.className = 'salon-group';
+
+    const header = document.createElement('div');
+    header.className = 'salon-header';
+    header.innerHTML =
+      '<div class="salon-header-icon">' + zona + '</div>' +
+      '<div class="salon-header-info">' +
+        '<div class="salon-header-name">' + sName + '</div>' +
+        '<div class="salon-header-count">' + congs.length + ' congregaci' + (congs.length === 1 ? 'ón' : 'ones') + '</div>' +
+      '</div>' +
+      '<div class="salon-chevron">›</div>';
+
+    header.onclick = () => {
+      group.classList.toggle('open');
+    };
+
+    const congsDiv = document.createElement('div');
+    congsDiv.className = 'salon-congs';
+
+    congs.forEach(c => {
+      const isActive = selected && selected.id === c.id;
+      const item = document.createElement('div');
+      item.className = 'salon-cong-item' + (isActive ? ' active' : '');
+      item.onclick = () => selectCong(c);
+      item.innerHTML =
+        '<div class="salon-cong-dot"></div>' +
+        '<div class="salon-cong-name">' + c.nombre + '</div>' +
+        '<div class="cong-arrow" style="opacity:' + (isActive ? '1' : '0') + ';transform:' + (isActive ? 'translateX(0)' : 'translateX(-4px)') + ';font-size:16px;color:var(--gold)">›</div>';
+      congsDiv.appendChild(item);
+    });
+
+    const divider = document.createElement('div');
+    divider.className = 'salon-divider';
+
+    group.appendChild(header);
+    group.appendChild(congsDiv);
+    group.appendChild(divider);
+    list.appendChild(group);
+  });
+}
+
+// ── RENDER DETAIL ───────────────────────────────────────────────────
+function renderDetail(c){
+  const inner    = document.getElementById('detailInner');
+  const s        = getSalon(c);
+  const pending  = isPending(c);
+  const zonaLabel = c.zona === 'valle' ? '🌾 Valle de Mexicali' : '🏙 Ciudad de Mexicali';
+  const zonaTag   = c.zona === 'valle' ? 'Valle' : 'Ciudad';
+
+  if(pending){
+    inner.innerHTML =
+      '<div class="detail-wrap">' +
+        '<div class="hero">' +
+          '<div class="hero-glow"></div><div class="hero-pattern"></div>' +
+          '<div class="hero-body">' +
+            '<div class="hero-eyebrow">Congregación · ' + zonaTag + '</div>' +
+            '<div class="hero-title">' + c.nombre + '</div>' +
+            '<div class="hero-zona">' + zonaLabel + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pending-card">' +
+          '<div class="pending-card-icon">⚠️</div>' +
+          '<p>La dirección exacta de esta congregación está pendiente de registro. Se actualizará próximamente para activar la navegación en Google Maps.</p>' +
+        '</div>' +
+        '<div class="actions">' +
+          '<a href="https://www.google.com/maps/search/' + encodeURIComponent(c.nombre + ' Mexicali Baja California') + '" target="_blank" class="btn btn-ghost">🔍 Buscar en Maps</a>' +
+        '</div>' +
+      '</div>';
+    return;
+  }
+
+  const mapsNav  = 'https://www.google.com/maps/dir/?api=1&destination=' + s.lat + ',' + s.lng;
+  const mapsOpen = s.maps || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(s.direccion);
+  inner.innerHTML =
+    '<div class="detail-wrap">' +
+      '<div class="hero">' +
+        '<div class="hero-glow"></div><div class="hero-pattern"></div>' +
+        '<div class="hero-body">' +
+          '<div class="hero-eyebrow">Congregación · ' + zonaTag + '</div>' +
+          '<div class="hero-title">' + c.nombre + '</div>' +
+          '<div class="hero-zona">' + zonaLabel + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="info-grid">' +
+        '<div class="info-card">' +
+          '<div class="info-card-icon">📍</div>' +
+          '<div class="info-card-body">' +
+            '<div class="info-label">Dirección del Salón del Reino</div>' +
+            '<div class="info-value">' + s.direccion + '</div>' +
+          '</div>' +
+        '</div>' +
+        (s.phone ?
+          '<div class="info-card">' +
+            '<div class="info-card-icon">📞</div>' +
+            '<div class="info-card-body">' +
+              '<div class="info-label">Teléfono</div>' +
+              '<div class="info-value"><a href="tel:' + s.phone + '">' + s.phone + '</a></div>' +
+            '</div>' +
+          '</div>'
+        : '') +
+      '</div>' +
+      '<div class="map-card">' +
+        '<div class="map-header">' +
+          '<div class="map-title">Ubicación del salón</div>' +
+          '<button class="map-open-btn" onclick="window.open(\'' + mapsOpen + '\',\'_blank\')">Abrir en Maps ›</button>' +
+        '</div>' +
+        '<div class="map-frame" onclick="window.open(\'' + mapsOpen + '\',\'_blank\')">' +
+          '<div class="map-thumb-inner"><div class="map-pin">\ud83d\udccd</div><div class="map-coords">' + s.lat.toFixed(5) + ', ' + s.lng.toFixed(5) + '</div><div class="map-tap">Toca para abrir en Google Maps</div></div>' +
+          '<div class="map-overlay"><div class="map-overlay-pill">\ud83d\uddfa Ver en Google Maps</div></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="actions">' +
+        '<a href="' + mapsNav + '" target="_blank" class="btn btn-primary">🧭 Cómo llegar</a>' +
+        '<a href="' + mapsOpen + '" target="_blank" class="btn btn-secondary">🗺 Ver en Maps</a>' +
+        (s.phone ? '<a href="tel:' + s.phone + '" class="btn btn-ghost">📞 Llamar</a>' : '') +
+      '</div>' +
+    '</div>';
+}
+
+// ── ACTIONS ──────────────────────────────────────────────────────────
+function selectCong(c){
+  selected = c;
+  renderList();
+  renderDetail(c);
+  document.getElementById('layout').classList.add('show-detail');
+  const det = document.getElementById('detail');
+  if(det) det.scrollTop = 0;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function goBack(){
+  document.getElementById('layout').classList.remove('show-detail');
+  selected = null;
+  renderList();
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = function(){
+    currentTab = this.dataset.tab;
+    selected   = null;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('detailInner').innerHTML =
+      '<div class="empty">' +
+        '<div class="empty-ring">🏛️</div>' +
+        '<h2>Selecciona una congregación</h2>' +
+        '<p>Elige cualquier congregación de la lista para ver su ubicación y cómo llegar.</p>' +
+      '</div>';
+    renderList();
+  };
+});
+
+renderList();
+</script>
+</body>
+</html>
